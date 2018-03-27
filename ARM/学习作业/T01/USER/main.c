@@ -1,5 +1,6 @@
 #include "stm32f10x.h"
 #include <stdio.h>
+#include <lcd.h>
 
 #define LED1   GPIO_Pin_8
 #define LED2   GPIO_Pin_9
@@ -11,12 +12,13 @@
 #define LED8   GPIO_Pin_15
 #define LEDALL LED1 | LED2 | LED3| LED4 | LED5 | LED6 | LED7 | LED8
 
+void Delay_ms(uint16_t time_ms);
 void Init_all(void);
 void Init_key(void);
 void Init_led(void);
 void LED_Ctrl(uint16_t la,uint8_t lb);
-void Init_pwm(void);
 void Init_lcd(void);
+void Init_pwm(void);
 void Init_usert(void);
 void Init_clock(void);
 
@@ -24,12 +26,16 @@ void Init_clock(void);
 int main(void)
 {
 	Init_all();
+	LCD_DisplayStringLine(Line0,"Hello World!");
   while (1)
   {
   }
 }
 
 /********子函数区*********/
+void Delay_ms(uint16_t time_ms){
+	
+}
 void Init_all(void){
 	Init_key();
 	Init_led();
@@ -78,10 +84,13 @@ void LED_Ctrl(uint16_t ledx,uint8_t led_status){
 	GPIO_SetBits(GPIOD,GPIO_Pin_2);
 	GPIO_ResetBits(GPIOD,GPIO_Pin_2);
 }
-void Init_pwm(void)
-{
+void Init_lcd(void){
+	STM3210B_LCD_Init();
+	LCD_Clear(White);
+	LCD_SetTextColor(Black);
+	LCD_SetBackColor(White);
 }
-void Init_lcd(void)
+void Init_pwm(void)
 {
 }
 void Init_usert(void)
