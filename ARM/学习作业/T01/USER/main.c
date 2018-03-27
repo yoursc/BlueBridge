@@ -12,8 +12,10 @@
 #define LED8   GPIO_Pin_15
 #define LEDALL LED1 | LED2 | LED3| LED4 | LED5 | LED6 | LED7 | LED8
 
-void Delay_ms(uint16_t time_ms);
+uint32_t msTimer;
+
 void Init_all(void);
+void Delay_ms(uint16_t time_ms);
 void Init_key(void);
 void Init_led(void);
 void LED_Ctrl(uint16_t la,uint8_t lb);
@@ -22,27 +24,32 @@ void Init_pwm(void);
 void Init_usert(void);
 void Init_clock(void);
 
-/*********主函数**********/
+/***********************/
+/********主函数*********/
+/***********************/
 int main(void)
 {
 	Init_all();
-	LCD_DisplayStringLine(Line0,"Hello World!");
   while (1)
   {
   }
 }
 
+/*************************/
 /********子函数区*********/
-void Delay_ms(uint16_t time_ms){
-	
-}
+/*************************/
 void Init_all(void){
+	SysTick_Config(SystemCoreClock/1000);
 	Init_key();
 	Init_led();
 	Init_pwm();
 	Init_lcd();
 	Init_usert();
 	Init_clock();
+}
+void Delay_ms(uint16_t time_ms){
+	msTimer=time_ms;
+	while(msTimer);
 }
 void Init_key(void){
 	/* 按键  B1   B2   B3   B4  共地
@@ -61,6 +68,9 @@ void Init_key(void){
 	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_1|GPIO_Pin_2;
 	GPIO_InitStruct.GPIO_Speed= GPIO_Speed_2MHz;
 	GPIO_Init(GPIOB,&GPIO_InitStruct);
+}
+{
+	GPIO_ReadInputDataBit(GPIOx, uint16_t GPIO_Pin);
 }
 void Init_led(void){
 	/* 小灯 LD1 LD2
