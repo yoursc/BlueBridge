@@ -1,0 +1,9 @@
+使用资源：
+按键 B1 B2 B3 B4
+LED灯 LD1 LD2
+
+串口接收
+LCD显示
+PA1 PA2 PWM波输出
+EEPROM
+时钟
