@@ -13,6 +13,9 @@
 #define LEDALL LED1 | LED2 | LED3| LED4 | LED5 | LED6 | LED7 | LED8
 
 uint32_t msTimer;
+uint8_t PA1_ON=0,PA2_ON=0;    //两输出口开关标志位
+uint8_t PWM_PA1=90,PWM_PA2=0;  //pwm波占空比设定值 0 - 100
+uint8_t t_h=23,t_m=59,t_s=50;  //时间临时变量
 
 void Init_all(void);
 void Delay_ms(uint16_t time_ms);
@@ -23,6 +26,7 @@ void Init_lcd(void);
 void Init_pwm(void);
 void Init_usert(void);
 void Init_clock(void);
+void Show(void);
 
 /***********************/
 /********主函数*********/
@@ -30,6 +34,7 @@ void Init_clock(void);
 int main(void)
 {
 	Init_all();
+	Show();
   while (1)
   {
   }
@@ -69,9 +74,6 @@ void Init_key(void){
 	GPIO_InitStruct.GPIO_Speed= GPIO_Speed_2MHz;
 	GPIO_Init(GPIOB,&GPIO_InitStruct);
 }
-{
-	GPIO_ReadInputDataBit(GPIOx, uint16_t GPIO_Pin);
-}
 void Init_led(void){
 	/* 小灯 LD1 LD2
 	** 接口 PC8 PC9  */
@@ -109,6 +111,22 @@ void Init_usert(void)
 void Init_clock(void)
 {
 }
-
+void Show(void){
+	uint8_t  string[20],user_string[20];
+	
+	sprintf(string," PWM_PA1:%3d%%",PWM_PA1);
+	LCD_DisplayStringLine(Line1,string);
+	sprintf(string," PWM_PA1:%3d%%",PWM_PA2);
+	LCD_DisplayStringLine(Line2,string);
+	
+	sprintf(string," Time   :%2d:%2d:%2d",t_h,t_m,t_s);
+	LCD_DisplayStringLine(Line4,string);
+	
+	LCD_DisplayStringLine(Line5," Channel:           ");
+	
+	LCD_DisplayStringLine(Line6," Commind:           ");
+	sprintf(user_string,"        None        ");
+	LCD_DisplayStringLine(Line7,user_string);
+}
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
