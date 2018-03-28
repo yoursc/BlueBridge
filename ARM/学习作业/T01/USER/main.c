@@ -16,15 +16,16 @@
 #define B2 GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8)
 #define B3 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1)
 #define B4 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_2)
+
 uint32_t msTimer;
 uint8_t PA1_ON=0,PA2_ON=0;    //两输出口开关标志位
 uint8_t PWM_PA1=90,PWM_PA2=0; //pwm波占空比设定值 0 - 100
 uint8_t t_h=23,t_m=59,t_s=50; //时间临时变量
 uint8_t KEY_IN=0x00;          //按键待处理标志位
+uint8_t user_string[20];
 
 void Delay_ms(uint16_t time_ms);
-void Init_key(void);
-void Init_led(void);
+void Init_GPIO(void);
 void LED_Ctrl(uint16_t la,uint8_t lb);
 void Init_lcd(void);
 void Init_pwm(void);
@@ -42,6 +43,7 @@ int main(void)
 {
 	Init_all();
 	LED_Ctrl(LEDALL,0);
+	sprintf(user_string,"        None        ");
 	Show();
 	while (1)
   {
@@ -59,25 +61,23 @@ void Delay_ms(uint16_t time_ms){
 	msTimer=time_ms;
 	while(msTimer);
 }
-void Init_key(void){
+void Init_GPIO(void){
 	/* 按键  B1   B2   B3   B4  共地
 	** 接口 PA0  PA8  PB1  PB2    */
+	/* 小灯 LD1 LD2
+	** 接口 PC8 PC9  */
+
 	GPIO_InitTypeDef  GPIO_InitStruct;
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA , ENABLE );
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB , ENABLE );
+	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
+	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
 	/***按键上拉输入***/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_0|GPIO_Pin_8;
 	GPIO_Init(GPIOA,&GPIO_InitStruct);
 	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_1|GPIO_Pin_2;
 	GPIO_Init(GPIOB,&GPIO_InitStruct);
-}
-void Init_led(void){
-	/* 小灯 LD1 LD2
-	** 接口 PC8 PC9  */
-	GPIO_InitTypeDef GPIO_InitStruct;
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
 	/***LED灯推挽输出***/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStruct.GPIO_Pin  = LEDALL;
@@ -86,6 +86,7 @@ void Init_led(void){
 	/***LED灯控制锁存器***/
 	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_2;
 	GPIO_Init(GPIOD,&GPIO_InitStruct);
+	
 }
 void LED_Ctrl(uint16_t ledx,uint8_t led_status){
 	if(led_status==0)
@@ -111,16 +112,15 @@ void Init_clock(void)
 {
 }
 void Init_all(void){
-	SysTick_Config(SystemCoreClock/1000);
-	Init_key();
-	Init_led();
+	SysTick_Config(SystemCoreClock/1000); //1ms中断一次
+	Init_GPIO();
 	Init_pwm();
 	Init_lcd();
 	Init_usert();
 	Init_clock();
 }
 void Show(void){//接收串口数据显示尚未更改
-	uint8_t  string[20],user_string[20];
+	uint8_t  string[20];
 	
 	sprintf(string," PWM_PA1:%3d%%",PWM_PA1);
 	LCD_DisplayStringLine(Line1,string);
@@ -133,8 +133,7 @@ void Show(void){//接收串口数据显示尚未更改
 	LCD_DisplayStringLine(Line5," Channel:           ");
 	
 	LCD_DisplayStringLine(Line6," Commind:           ");
-	sprintf(user_string,"        None        ");
-	LCD_DisplayStringLine(Line7,user_string);
+//	LCD_DisplayStringLine(Line7,user_string);
 	/***刷新LED灯状态***/
 	GPIO_SetBits(GPIOC, LEDALL);
 	if(PA1_ON==0)
