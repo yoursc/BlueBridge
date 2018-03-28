@@ -12,11 +12,15 @@
 #define LED8   GPIO_Pin_15
 #define LEDALL LED1 | LED2 | LED3| LED4 | LED5 | LED6 | LED7 | LED8
 
+#define B1 GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)
+#define B2 GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8)
+#define B3 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1)
+#define B4 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_2)
 uint32_t msTimer;
 uint8_t PA1_ON=0,PA2_ON=0;    //两输出口开关标志位
 uint8_t PWM_PA1=90,PWM_PA2=0; //pwm波占空比设定值 0 - 100
 uint8_t t_h=23,t_m=59,t_s=50; //时间临时变量
-uint8_t KEY_IN=0x00;             //按键待处理标志位
+uint8_t KEY_IN=0x00;          //按键待处理标志位
 
 void Delay_ms(uint16_t time_ms);
 void Init_key(void);
@@ -131,6 +135,7 @@ void Show(void){//接收串口数据显示尚未更改
 	LCD_DisplayStringLine(Line6," Commind:           ");
 	sprintf(user_string,"        None        ");
 	LCD_DisplayStringLine(Line7,user_string);
+	/***刷新LED灯状态***/
 	GPIO_SetBits(GPIOC, LEDALL);
 	if(PA1_ON==0)
 		GPIO_SetBits(GPIOC, LED1);
@@ -148,26 +153,27 @@ void Show(void){//接收串口数据显示尚未更改
 
 void Scan_key(void){
 	uint16_t Deviation_ms = 30;
-	if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0) == 0){
+	if(B1 == 0){
 		Delay_ms(Deviation_ms);
-		if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0) == 0)
+		if(B1 == 0)
 			KEY_IN = 0x01;
 	}
-	if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8) == 0){
+	if(B2 == 0){
 		Delay_ms(Deviation_ms);
-		if(GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8) == 0)
+		if(B2 == 0)
 			KEY_IN = 0x02;
 	}
-	if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1) == 0){
+	if(B3 == 0){
 		Delay_ms(Deviation_ms);
-		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1) == 0)
+		if(B3 == 0)
 			KEY_IN = 0x03;
 	}
-	if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_2) == 0){
+	if(B4 == 0){
 		Delay_ms(Deviation_ms);
-		if(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_2) == 0)
+		if(B4 == 0)
 			KEY_IN = 0x04;
 	}
+	Delay_ms(100);
 }
 void Handle_key(void){
 	switch(KEY_IN){
