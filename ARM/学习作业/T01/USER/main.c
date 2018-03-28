@@ -37,11 +37,12 @@ void Handle_key(void);
 int main(void)
 {
 	Init_all();
+	LED_Ctrl(LEDALL,0);
 	Show();
 	while (1)
   {
 		Scan_key();
-		if(KEY_IN != 0x00){
+		if(KEY_IN){
 			Handle_key();
 		}
   }
@@ -75,22 +76,20 @@ void Init_led(void){
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
 	/***LED灯推挽输出***/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStruct.GPIO_Pin  = LED1 | LED2 | LED3| LED4 | LED5 | LED6 | LED7 | LED8;
-	GPIO_InitStruct.GPIO_Speed= GPIO_Speed_2MHz;
+	GPIO_InitStruct.GPIO_Pin  = LEDALL;
+	GPIO_InitStruct.GPIO_Speed= GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC,&GPIO_InitStruct);
 	/***LED灯控制锁存器***/
 	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_2;
 	GPIO_Init(GPIOD,&GPIO_InitStruct);
-	
-	LED_Ctrl(LEDALL,0);
 }
 void LED_Ctrl(uint16_t ledx,uint8_t led_status){
-	if(led_status==1)
-		GPIO_ResetBits(GPIOC, ledx);
-	else
+	if(led_status==0)
 		GPIO_SetBits(GPIOC, ledx);
+	else
+		GPIO_ResetBits(GPIOC, ledx);
 	GPIO_SetBits(GPIOD,GPIO_Pin_2);
-	GPIO_ResetBits(GPIOD,GPIO_Pin_2);
+  GPIO_ResetBits(GPIOD,GPIO_Pin_2);
 }
 void Init_lcd(void){
 	STM3210B_LCD_Init();
@@ -132,6 +131,19 @@ void Show(void){//接收串口数据显示尚未更改
 	LCD_DisplayStringLine(Line6," Commind:           ");
 	sprintf(user_string,"        None        ");
 	LCD_DisplayStringLine(Line7,user_string);
+	GPIO_SetBits(GPIOC, LEDALL);
+	if(PA1_ON==0)
+		GPIO_SetBits(GPIOC, LED1);
+	else
+		GPIO_ResetBits(GPIOC, LED1);
+	
+	if(PA2_ON==0)
+		GPIO_SetBits(GPIOC, LED2);
+	else
+		GPIO_ResetBits(GPIOC, LED2);
+	
+	GPIO_SetBits(GPIOD,GPIO_Pin_2);
+  GPIO_ResetBits(GPIOD,GPIO_Pin_2);
 }
 
 void Scan_key(void){
@@ -178,5 +190,6 @@ void Handle_key(void){
 	}
 	Show();
 	KEY_IN=0x00;
+
 }
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
