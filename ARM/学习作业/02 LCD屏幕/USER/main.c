@@ -1,7 +1,10 @@
 #include "stm32f10x.h"
 #include <stdio.h>
 #include "lcd.h"
-
+//使用lcd屏幕时,使用了PC总线
+//LED灯使用的也是PC总线
+//访问LCD后再访问LED时
+//锁存器外的PC上的数据已被修改，请注意
 int main(void)
 {
 	STM3210B_LCD_Init();
