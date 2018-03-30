@@ -3,40 +3,41 @@
 #include "lcd.h"
 #include "led.h"
 #include "key.h"
-
+#include "usert.h"
 
 uint32_t msTimer;
 uint8_t PA1_ON=0,PA2_ON=0;    //两输出口开关标志位
 uint8_t PWM_PA1=90,PWM_PA2=0; //pwm波占空比设定值 0 - 100
 uint8_t t_h=23,t_m=59,t_s=50; //时间临时变量
-uint8_t KEY_IN=0x00;          //按键待处理标志位
 uint8_t user_string[20];
 
 void Delay_ms(uint16_t time_ms);
-void Init_lcd(void);
 void Init_pwm(void);
 void Init_usert(void);
 void Init_clock(void);
 void Init_all(void);
 void Show(void);
-void Handle_key(void);
-
+void Handle_key(uint8_t KEY_IN);
 /***********************/
 /********主函数*********/
 /***********************/
 int main(void)
 {
+	SysTick_Config(SystemCoreClock/1000); //1ms中断一次
 	Init_all();
+	
+	STM3210B_LCD_Init();
+	LCD_Clear(Black);
+	LCD_SetTextColor(Green);
+	LCD_SetBackColor(Black);
+	
 	LED_Ctrl(LEDALL,0);
 	sprintf(user_string,"        None        ");
 	Show();
 	while (1)
   {
-		KEY_IN=Scan_key();
+		Handle_key(Scan_key());
 		Delay_ms(100);
-		if(KEY_IN){
-			Handle_key();
-		}
   }
 }
 
@@ -59,12 +60,6 @@ void Init_GPIO(void){
 	GPIO_InitStruct.GPIO_Speed= GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC,&GPIO_InitStruct);
 }
-void Init_lcd(void){
-	STM3210B_LCD_Init();
-	LCD_Clear(White);
-	LCD_SetTextColor(Black);
-	LCD_SetBackColor(White);
-}
 void Init_pwm(void)
 {
 }
@@ -75,11 +70,9 @@ void Init_clock(void)
 {
 }
 void Init_all(void){
-	SysTick_Config(SystemCoreClock/1000); //1ms中断一次
 	Init_GPIO();
 	Init_LED();
 	Init_pwm();
-	Init_lcd();
 	Init_usert();
 	Init_clock();
 }
@@ -114,7 +107,7 @@ void Show(void){//接收串口数据显示尚未更改
   GPIO_ResetBits(GPIOD,GPIO_Pin_2);
 }
 
-void Handle_key(void){
+void Handle_key(uint8_t KEY_IN){
 	switch(KEY_IN){
 		case 0x01:
 			PA1_ON = ~PA1_ON;
@@ -132,9 +125,9 @@ void Handle_key(void){
 			if(PWM_PA2>100)
 				PWM_PA2=0;
 			break;
+		default:
+			break;
 	}
 	Show();
-	KEY_IN=0x00;
-
 }
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/

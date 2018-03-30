@@ -453,6 +453,21 @@
               <FileType>1</FileType>
               <FilePath>.\lcd.c</FilePath>
             </File>
+            <File>
+              <FileName>led.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\led.c</FilePath>
+            </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\key.c</FilePath>
+            </File>
+            <File>
+              <FileName>usert.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\usert.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
