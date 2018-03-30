@@ -5,9 +5,11 @@
 #include "usart.h"
 #include "lcd.h"
 #include "i2c.h"
+#include "adc.h"
 
 uint32_t msTimer;
 
+void Delay_ms(uint32_t xMs);
 uint8_t x24c02_read(uint8_t address);
 void x24c02_write(uint8_t address,uint8_t info);
 
@@ -22,6 +24,7 @@ int main(void)
 	Init_Led();
 	KEY_Init();
 	Init_Usart();
+	Init_Adc();
 	i2c_init();	
 	STM3210B_LCD_Init();
 	LCD_Clear(Black);
@@ -34,8 +37,10 @@ int main(void)
 	temp = x24c02_read(0xfe);
 	sprintf(string,"%s%d","ADDR:0xFF,VAL:",temp);
 	LCD_DisplayStringLine(Line6,string);
-	while(1){			
-
+	while(1){
+		Delay_ms(200);
+		sprintf(string,"%s%.3f","ADC Value:",Read_ADC());
+		LCD_DisplayStringLine(Line7,string);
 	}
 }
 
