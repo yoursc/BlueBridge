@@ -1,16 +1,7 @@
 #include "stm32f10x.h"
 #include <stdio.h>
-#include <lcd.h>
-
-#define LED1   GPIO_Pin_8
-#define LED2   GPIO_Pin_9
-#define LED3   GPIO_Pin_10
-#define LED4   GPIO_Pin_11
-#define LED5   GPIO_Pin_12
-#define LED6   GPIO_Pin_13
-#define LED7   GPIO_Pin_14
-#define LED8   GPIO_Pin_15
-#define LEDALL LED1 | LED2 | LED3| LED4 | LED5 | LED6 | LED7 | LED8
+#include "lcd.h"
+#include "led.h"
 
 #define B1 GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)
 #define B2 GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8)
@@ -25,8 +16,6 @@ uint8_t KEY_IN=0x00;          //按键待处理标志位
 uint8_t user_string[20];
 
 void Delay_ms(uint16_t time_ms);
-void Init_GPIO(void);
-void LED_Ctrl(uint16_t la,uint8_t lb);
 void Init_lcd(void);
 void Init_pwm(void);
 void Init_usert(void);
@@ -62,39 +51,24 @@ void Delay_ms(uint16_t time_ms){
 	while(msTimer);
 }
 void Init_GPIO(void){
-	/* 按键  B1   B2   B3   B4  共地
-	** 接口 PA0  PA8  PB1  PB2    */
-	/* 小灯 LD1 LD2
-	** 接口 PC8 PC9  */
-
+	/* 按键 B1  B2  B3  B4  共地  PWM1 PWM2
+	   接口 PA0 PA8 PB1 PB2       PA1  PA2
+	*/
 	GPIO_InitTypeDef  GPIO_InitStruct;
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA , ENABLE );
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB , ENABLE );
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD, ENABLE );
 	/***按键上拉输入***/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
 	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_0|GPIO_Pin_8;
 	GPIO_Init(GPIOA,&GPIO_InitStruct);
 	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_1|GPIO_Pin_2;
 	GPIO_Init(GPIOB,&GPIO_InitStruct);
-	/***LED灯推挽输出***/
+	/***PWM输出口***/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStruct.GPIO_Pin  = LEDALL;
 	GPIO_InitStruct.GPIO_Speed= GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC,&GPIO_InitStruct);
-	/***LED灯控制锁存器***/
-	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_2;
-	GPIO_Init(GPIOD,&GPIO_InitStruct);
-	
-}
-void LED_Ctrl(uint16_t ledx,uint8_t led_status){
-	if(led_status==0)
-		GPIO_SetBits(GPIOC, ledx);
-	else
-		GPIO_ResetBits(GPIOC, ledx);
-	GPIO_SetBits(GPIOD,GPIO_Pin_2);
-  GPIO_ResetBits(GPIOD,GPIO_Pin_2);
 }
 void Init_lcd(void){
 	STM3210B_LCD_Init();
@@ -114,6 +88,7 @@ void Init_clock(void)
 void Init_all(void){
 	SysTick_Config(SystemCoreClock/1000); //1ms中断一次
 	Init_GPIO();
+	Init_LED();
 	Init_pwm();
 	Init_lcd();
 	Init_usert();
