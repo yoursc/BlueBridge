@@ -2,11 +2,8 @@
 #include <stdio.h>
 #include "lcd.h"
 #include "led.h"
+#include "key.h"
 
-#define B1 GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_0)
-#define B2 GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8)
-#define B3 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1)
-#define B4 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_2)
 
 uint32_t msTimer;
 uint8_t PA1_ON=0,PA2_ON=0;    //两输出口开关标志位
@@ -22,7 +19,6 @@ void Init_usert(void);
 void Init_clock(void);
 void Init_all(void);
 void Show(void);
-void Scan_key(void);
 void Handle_key(void);
 
 /***********************/
@@ -36,7 +32,8 @@ int main(void)
 	Show();
 	while (1)
   {
-		Scan_key();
+		KEY_IN=Scan_key();
+		Delay_ms(100);
 		if(KEY_IN){
 			Handle_key();
 		}
@@ -55,15 +52,7 @@ void Init_GPIO(void){
 	   接口 PA0 PA8 PB1 PB2       PA1  PA2
 	*/
 	GPIO_InitTypeDef  GPIO_InitStruct;
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOA , ENABLE );
-	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB , ENABLE );
 	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOC, ENABLE );
-	/***按键上拉输入***/
-	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPU;
-	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_0|GPIO_Pin_8;
-	GPIO_Init(GPIOA,&GPIO_InitStruct);
-	GPIO_InitStruct.GPIO_Pin  = GPIO_Pin_1|GPIO_Pin_2;
-	GPIO_Init(GPIOB,&GPIO_InitStruct);
 	/***PWM输出口***/
 	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStruct.GPIO_Pin  = LEDALL;
@@ -125,30 +114,6 @@ void Show(void){//接收串口数据显示尚未更改
   GPIO_ResetBits(GPIOD,GPIO_Pin_2);
 }
 
-void Scan_key(void){
-	uint16_t Deviation_ms = 30;
-	if(B1 == 0){
-		Delay_ms(Deviation_ms);
-		if(B1 == 0)
-			KEY_IN = 0x01;
-	}
-	if(B2 == 0){
-		Delay_ms(Deviation_ms);
-		if(B2 == 0)
-			KEY_IN = 0x02;
-	}
-	if(B3 == 0){
-		Delay_ms(Deviation_ms);
-		if(B3 == 0)
-			KEY_IN = 0x03;
-	}
-	if(B4 == 0){
-		Delay_ms(Deviation_ms);
-		if(B4 == 0)
-			KEY_IN = 0x04;
-	}
-	Delay_ms(100);
-}
 void Handle_key(void){
 	switch(KEY_IN){
 		case 0x01:
