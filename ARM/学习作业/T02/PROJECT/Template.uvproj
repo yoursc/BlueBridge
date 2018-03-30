@@ -443,6 +443,16 @@
               <FileType>1</FileType>
               <FilePath>..\USER\src\led.c</FilePath>
             </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\src\key.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\src\usart.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
