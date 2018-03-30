@@ -428,16 +428,21 @@
               <FileType>1</FileType>
               <FilePath>..\USER\stm32f10x_it.c</FilePath>
             </File>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\lcd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>MOD</GroupName>
           <Files>
-            <File>
-              <FileName>lcd.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\USER\src\lcd.c</FilePath>
-            </File>
             <File>
               <FileName>led.c</FileName>
               <FileType>1</FileType>

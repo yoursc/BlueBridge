@@ -4,6 +4,7 @@
 #include "key.h"
 #include "usart.h"
 #include "lcd.h"
+#include "i2c.h"
 
 uint32_t msTimer;
 
