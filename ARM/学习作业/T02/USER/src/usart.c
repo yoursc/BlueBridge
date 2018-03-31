@@ -7,7 +7,7 @@ void Init_Usart(void)
 	
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-	NVIC_Configuration();
+	USART_NVIC();
   //Rx 输入端IO口初始化
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
@@ -32,14 +32,15 @@ void Init_Usart(void)
   USART_Cmd(USART2, ENABLE);
 }
 
-void NVIC_Configuration(void)
+void USART_NVIC(void)
 {
   NVIC_InitTypeDef NVIC_InitStructure;
 
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
   
   NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 }

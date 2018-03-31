@@ -5,7 +5,7 @@
 
 
 void Init_Usart(void);
-void NVIC_Configuration(void);
+void USART_NVIC(void);
 void USART_SendString(int8_t *str);
 
 #endif

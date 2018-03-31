@@ -16,6 +16,7 @@ void KEY_Init(void){
 	GPIO_InitStruct.GPIO_Pin=GPIO_Pin_1 | GPIO_Pin_2;
 	GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
+
 uint8_t Key_Scan(void){
 	uint8_t Deviation = 20; //消抖时长
 	uint8_t key_value=0x00;
