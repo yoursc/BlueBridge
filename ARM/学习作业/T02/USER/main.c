@@ -7,6 +7,7 @@
 #include "i2c.h"
 #include "adc.h"
 #include "rtc.h"
+#include "pwm.h"
 
 uint32_t msTimer;
 
@@ -28,6 +29,8 @@ int main(void)
 	Init_Adc();
 	i2c_init();
 	Init_RTC();
+	Init_PWM();
+	PWM_Ctrl(50,70);
 	STM3210B_LCD_Init();
 	LCD_Clear(Black);
 	LCD_SetBackColor(Black);

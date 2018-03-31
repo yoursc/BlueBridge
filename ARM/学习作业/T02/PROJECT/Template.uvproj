@@ -468,6 +468,11 @@
               <FileType>1</FileType>
               <FilePath>..\USER\src\rtc.c</FilePath>
             </File>
+            <File>
+              <FileName>pwm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\USER\src\pwm.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
