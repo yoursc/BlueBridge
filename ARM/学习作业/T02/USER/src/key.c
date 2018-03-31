@@ -2,7 +2,7 @@
 
 extern void Delay_ms(uint32_t xMs);
 
-void KEY_Init(void){
+void Init_KEY(void){
 	GPIO_InitTypeDef  GPIO_InitStruct;
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);

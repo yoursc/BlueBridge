@@ -8,7 +8,7 @@
 #define B3 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_1)
 #define B4 GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_2)
 
-void KEY_Init(void);
+void Init_KEY(void);
 uint8_t Key_Scan(void);
 
 #endif

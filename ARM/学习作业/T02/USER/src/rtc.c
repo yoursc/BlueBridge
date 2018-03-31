@@ -7,7 +7,7 @@
 
 uint32_t TimeDisplay; //RTC时间更新标志位
 
-void RTC_Configuration(void)
+void Init_RTC(void)
 {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
 
@@ -32,6 +32,7 @@ void RTC_Configuration(void)
 	
 	RTC_SetCounter(HH*3600+MM*60+SS);
 	RTC_WaitForLastTask();
+	RTC_NVIC();
 }
 
 void RTC_NVIC(void)

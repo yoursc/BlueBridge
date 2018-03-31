@@ -5,7 +5,7 @@
 
 extern uint32_t TimeDisplay; //RTC时间更新标志位
 
-void RTC_Configuration(void);
+void Init_RTC(void);
 void RTC_NVIC(void);
 
 #endif

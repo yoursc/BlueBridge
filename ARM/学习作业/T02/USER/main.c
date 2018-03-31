@@ -23,12 +23,11 @@ int main(void)
 	SysTick_Config(SystemCoreClock/1000);  //滴答定时器设定
 	//外设初始化
 	Init_Led();
-	KEY_Init();
+	Init_KEY();
 	Init_Usart();
 	Init_Adc();
 	i2c_init();
-	RTC_Configuration();
-	RTC_NVIC();
+	Init_RTC();
 	STM3210B_LCD_Init();
 	LCD_Clear(Black);
 	LCD_SetBackColor(Black);
@@ -45,12 +44,11 @@ int main(void)
 		sprintf(string,"%s%.3f","ADC Value:",Read_ADC());
 		LCD_DisplayStringLine(Line7,string);
 		if(TimeDisplay == 1){
-			uint32_t TimeVar = RTC_GetCounter(); 
+			uint32_t TimeVar = RTC_GetCounter();
 			sprintf(string,"Time: %0.2d:%0.2d:%0.2d",(TimeVar/3600), ((TimeVar%3600)/60), ((TimeVar%3600)%60));
 			LCD_DisplayStringLine(Line8,string);
 			TimeDisplay = 0;  //清除标志位
 		}
-
 	}
 }
 
@@ -60,33 +58,33 @@ uint8_t x24c02_read(uint8_t address)
 {
 	unsigned char val;
 	
-	I2CStart(); 
-	I2CSendByte(0xa0);
-	I2CWaitAck(); 
-	
-	I2CSendByte(address);
-	I2CWaitAck(); 
-	
 	I2CStart();
-	I2CSendByte(0xa1); 
+	I2CSendByte(0xa0);
 	I2CWaitAck();
-	val = I2CReceiveByte(); 
+
+	I2CSendByte(address);
+	I2CWaitAck();
+
+	I2CStart();
+	I2CSendByte(0xa1);
+	I2CWaitAck();
+	val = I2CReceiveByte();
 	I2CWaitAck();
 	I2CStop();
-	
+
 	return(val);
 }
 
 void x24c02_write(unsigned char address,unsigned char info)
 {
-	I2CStart(); 
-	I2CSendByte(0xa0); 
-	I2CWaitAck(); 
-	
-	I2CSendByte(address);	
-	I2CWaitAck(); 
-	I2CSendByte(info); 
-	I2CWaitAck(); 
+	I2CStart();
+	I2CSendByte(0xa0);
+	I2CWaitAck();
+
+	I2CSendByte(address);
+	I2CWaitAck();
+	I2CSendByte(info);
+	I2CWaitAck();
 	I2CStop();
 }
 
