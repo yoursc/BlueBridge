@@ -6,6 +6,7 @@
 #include "lcd.h"
 #include "i2c.h"
 #include "adc.h"
+#include "rtc.h"
 
 uint32_t msTimer;
 
@@ -20,17 +21,19 @@ int main(void)
 	uint8_t temp;
 	uint8_t string[20];
 	SysTick_Config(SystemCoreClock/1000);  //滴答定时器设定
-
+	//外设初始化
 	Init_Led();
 	KEY_Init();
 	Init_Usart();
 	Init_Adc();
-	i2c_init();	
+	i2c_init();
+	RTC_Configuration();
+	RTC_NVIC();
 	STM3210B_LCD_Init();
 	LCD_Clear(Black);
 	LCD_SetBackColor(Black);
 	LCD_SetTextColor(Green);
-	
+	//初始化结束
 	LED_Control(LEDALL,0);
 	LED_Control(LED1,1);
 	USART_SendString("Welcome to GXCT\r\n");
@@ -41,6 +44,13 @@ int main(void)
 		Delay_ms(200);
 		sprintf(string,"%s%.3f","ADC Value:",Read_ADC());
 		LCD_DisplayStringLine(Line7,string);
+		if(TimeDisplay == 1){
+			uint32_t TimeVar = RTC_GetCounter(); 
+			sprintf(string,"Time: %0.2d:%0.2d:%0.2d",(TimeVar/3600), ((TimeVar%3600)/60), ((TimeVar%3600)%60));
+			LCD_DisplayStringLine(Line8,string);
+			TimeDisplay = 0;  //清除标志位
+		}
+
 	}
 }
 
