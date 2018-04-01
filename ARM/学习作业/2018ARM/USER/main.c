@@ -5,6 +5,8 @@
 
 //自建头文件
 #include "led.h"
+#include "key.h"
+#include "pwm.h"
 
 //辅助变量
 u32 TimingDelay = 0;
@@ -19,8 +21,18 @@ void Delay_Ms(u32 nTime);
 //*****************************//
 int main(void)
 {
+	//初始化
 	SysTick_Config(SystemCoreClock/1000);
-
+	Init_Led();
+	Init_Key();
+	Init_Pwm();
+	
+	STM3210B_LCD_Init();
+	LCD_Clear(Black);
+	LCD_SetTextColor(Green);
+	LCD_SetBackColor(Black);
+	
+	LED_Control(LEDALL,0);
   while (1)
   {
 		
