@@ -2,6 +2,11 @@
 
 extern u32 TimingDelay;
 
+//中断服务函数
+void SysTick_Handler(void)
+{
+	TimingDelay--;
+}
 
 void NMI_Handler(void)
 {
@@ -48,11 +53,6 @@ void PendSV_Handler(void)
 }
 
 
-void Delay_Ms(u32 nTime)
-{
-	TimingDelay = nTime;
-   while(TimingDelay != 0);
-}
 
 /*void PPP_IRQHandler(void)
 {
