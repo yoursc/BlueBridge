@@ -19,36 +19,41 @@ void Init_Key(void){
 }
 
 uint8_t Key_Scan(void){
-	uint8_t Deviation = 20; //消抖时长
 	uint8_t key_value=0x00;
+//	uint8_t Deviation = 20; //消抖时长
+//	if(B1 == 0){
+//		Delay_Ms(Deviation);
+//		if(B1 == 0)
+//			key_value=0x01;
+//	}
 
-	if(B1 == 0){
-		Delay_Ms(Deviation);
-		if(B1 == 0){
-			key_value=0x01;
-		}
-	}
+//	if(B2 == 0){
+//		Delay_Ms(Deviation);
+//		if(B2 == 0)
+//			key_value=0x02;
+//	}
 
-	if(B2 == 0){
-		Delay_Ms(Deviation);
-		if(B2 == 0){
-			key_value=0x02;
-		}
-	}
+//	if(B3 == 0){
+//		Delay_Ms(Deviation);
+//		if(B3 == 0)
+//			key_value=0x03;
+//	}
 
-	if(B3 == 0){
-		Delay_Ms(Deviation);
-		if(B3 == 0){
-			key_value=0x03;
-		}
-	}
+//	if(B4 == 0){
+//		Delay_Ms(Deviation);
+//		if(B4 == 0)
+//			key_value=0x04;
+//	}
 
-	if(B4 == 0){
-		Delay_Ms(Deviation);
-		if(B4 == 0){
-			key_value=0x04;
-		}
-	}
+	if(B1 == 0)
+		key_value=0x01;
+	if(B2 == 0)
+		key_value=0x02;
+	if(B3 == 0)
+		key_value=0x03;
+	if(B4 == 0)
+		key_value=0x04;
+
 	return key_value;
 }
 
