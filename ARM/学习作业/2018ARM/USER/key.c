@@ -20,6 +20,7 @@ void Init_Key(void){
 
 uint8_t Key_Scan(void){
 	uint8_t key_value=0x00;
+	
 //	uint8_t Deviation = 20; //消抖时长
 //	if(B1 == 0){
 //		Delay_Ms(Deviation);

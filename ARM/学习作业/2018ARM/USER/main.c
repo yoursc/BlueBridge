@@ -32,6 +32,7 @@ void Show(u8 linex);
 void Show_Warning(u8 *ptr);
 void Deal_Key(uint8_t key);
 void Deal_Add(void);
+void Deal_Set_Mode(uint8_t mode);
 void Key_B1_S(void);
 void Key_B2_S(void);
 void Key_B3_S(void);
@@ -42,6 +43,8 @@ void Key_B3_L(void);
 void Key_B4_L(void);
 uint8_t x24c02_read(uint8_t address);
 void x24c02_write(unsigned char address,unsigned char info);
+void Time_Load(void);
+void Time_Save(uint8_t clockx);
 
 //*****************************//
 //**********主函数*************//
@@ -60,6 +63,7 @@ int main(void)
 	LCD_SetTextColor(Green);
 	LCD_SetBackColor(Black);
 	//变量初始化
+	Time_Load();
 	Now[0]=hh[Status_Clock-1];
 	Now[1]=mm[Status_Clock-1];
 	Now[2]=ss[Status_Clock-1];
@@ -157,10 +161,28 @@ void Deal_Add(void)
 	}
 }
 
+void Deal_Set_Mode(uint8_t mode)
+{
+	Status_Mode = mode;
+	switch(mode)
+	{
+		case 0:
+			hh[Status_Clock-1]=Now[0];
+			mm[Status_Clock-1]=Now[1];
+			ss[Status_Clock-1]=Now[2];
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+	}
+	Show(3);
+}
+
 //短按B1***************************
 void Key_B1_S(void)
 {
-	Status_Mode = 0;   //计时器停止
+	Deal_Set_Mode(0);//计时器停止
 	Status_Setting = 0;//设置结束
 	
 	Status_Clock+=1; 
@@ -173,20 +195,18 @@ void Key_B1_S(void)
 
 	Show(1);
 	Show(2);
-	Show(3);
 }
 //短按B2***************************
 void Key_B2_S(void)
 {
 	if( (Status_Mode==0) || (Status_Mode==3) ){
 		Status_Setting += 1;
-		Status_Mode = 3;
+		Deal_Set_Mode(3);
 		if(Status_Setting == 4){
 			Status_Setting = 0;
-			Status_Mode = 0;
+			Deal_Set_Mode(0);
 		}
 		Show(2);
-		Show(3);
 	}
 	else
 	{
@@ -205,7 +225,19 @@ void Key_B3_S(void)
 //短按B4***************************
 void Key_B4_S(void)
 {
-	LED_Control(LEDALL,0);
+	switch(Status_Mode)
+	{
+		case 2:
+			Deal_Set_Mode(1);
+			break;
+		case 3:
+			Show_Warning("Please Exit Set Mode");
+			break;
+		default:
+			Deal_Set_Mode(2);
+			break;
+	}
+	Deal_Set_Mode(Status_Mode);
 }
 //长按B1***************************
 void Key_B1_L(void)
@@ -221,7 +253,8 @@ void Key_B2_L(void)
 		Status_Setting = 0;
 		Show(2);
 		Show(3);
-		//此处待补充向EPROM存储的代码！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+		Time_Save(Status_Clock);
+		
 		sprintf(Strings," Clock %d has saving ! ",Status_Clock);		
 		Show_Warning(Strings);
 	}
@@ -245,8 +278,7 @@ void Key_B3_L(void)
 //长按B4***************************
 void Key_B4_L(void)
 {
-	LED_Control(LEDALL,0);
-	LED_Control(LED1,1);	
+	Deal_Set_Mode(0);
 }
 
 void Show(u8 linex)
@@ -334,6 +366,34 @@ void x24c02_write(unsigned char address,unsigned char info)
 	I2CSendByte(info);
 	I2CWaitAck();
 	I2CStop();
+}
+
+void Time_Load(void)
+{
+	u8 i;
+	unsigned char addr = Addr_Head;
+	for(i=0;i<=4;i++)
+	{
+		hh[i] = x24c02_read(addr);
+		addr += 0x01;
+		mm[i] = x24c02_read(addr);
+		addr += 0x01;
+		ss[i] = x24c02_read(addr);
+		addr += 0x01;
+	}
+}
+
+void Time_Save(uint8_t clockx)
+{
+	unsigned char addr = Addr_Head + 0x03*(clockx-1);
+	x24c02_write(addr,hh[clockx-1]);
+	Delay_Ms(20);
+	addr+=1;
+	x24c02_write(addr,mm[clockx-1]);
+	Delay_Ms(20);
+	addr+=1;
+	x24c02_write(addr,ss[clockx-1]);
+	Delay_Ms(20);
 }
 
 /******************* Edit By Yours <www.yoursc.cn> *****END OF FILE****/
