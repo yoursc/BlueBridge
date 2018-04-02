@@ -27,7 +27,8 @@ uint8_t Status_Setting = 0;//设置模式 0-非 1-时 2-分 3-秒
 void Delay_Ms(u32 nTime);
 void Show(u8 linex);
 void Show_Warning(u8 *ptr);
-void Key_Deal(uint8_t key);
+void Deal_Key(uint8_t key);
+void Deal_Add(void);
 void Key_B1_S(void);
 void Key_B2_S(void);
 void Key_B3_S(void);
@@ -66,7 +67,7 @@ int main(void)
 //	LCD_DisplayChar(Line1,319-16*2,'F');
   while (1)
   {
-		Key_Deal(Key_Scan());
+		Deal_Key(Key_Scan());
 		
   }
 }
@@ -81,7 +82,7 @@ void Delay_Ms(u32 nTime)
 }
 
 //长短按键区分
-void Key_Deal(uint8_t key)
+void Deal_Key(uint8_t key)
 {
 	u16 Key_Num = 0;          //按键长按计数器
 	u16 Key_Long_Set = 16 ;   //长按按键计数器阈值
@@ -135,6 +136,25 @@ void Key_Deal(uint8_t key)
 	Key_Num=0;	
 }
 
+void Deal_Add(void)
+{
+		switch(Status_Setting){
+			case 0:
+				Show_Warning(" Not in Set Mode !  ");
+				break;
+			case 1:
+				Now[Status_Setting-1]++;
+				if(	Now[Status_Setting-1]==24 )
+					Now[Status_Setting-1] = 0;
+				break;
+			default:
+				Now[Status_Setting-1]++;
+				if(	Now[Status_Setting-1]==60 )
+					Now[Status_Setting-1] = 0;
+				break;
+	}
+}
+
 //短按B1***************************
 void Key_B1_S(void)
 {
@@ -174,6 +194,11 @@ void Key_B2_S(void)
 //短按B3***************************
 void Key_B3_S(void)
 {
+	Deal_Add();
+	hh[Status_Clock-1]=Now[0];
+	mm[Status_Clock-1]=Now[1];
+	ss[Status_Clock-1]=Now[2];
+	Show(2);
 }
 //短按B4***************************
 void Key_B4_S(void)
@@ -205,6 +230,15 @@ void Key_B2_L(void)
 //长按B3***************************
 void Key_B3_L(void)
 {
+	while( Key_Scan()!=0x00 )
+	{
+		Deal_Add();
+		hh[Status_Clock-1]=Now[0];
+		mm[Status_Clock-1]=Now[1];
+		ss[Status_Clock-1]=Now[2];
+		Show(2);
+		Delay_Ms(100);
+	}
 }
 //长按B4***************************
 void Key_B4_L(void)
