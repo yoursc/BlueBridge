@@ -10,17 +10,20 @@
 
 //辅助变量
 u32 TimingDelay = 0;
-u8 hh[5]={1,2,3,4,5};
-u8 mm[5]={11,12,13,14,15};
-u8 ss[5]={21,22,23,24,25};
+uint8_t hh[5];
+uint8_t mm[5];
+uint8_t ss[5];
+u16 Key_Num = 0;          //按键长按计数器
+u16 Key_Long_Set = 16 ;   //长按按键计数器阈值
+u32 Key_Long_Delay = 50 ; //长按按键计数器周期 ms
 char Num_Table[10]={'0','1','2','3','4','5','6','7','8','9'};
 char Strings[20];  //转义打印变量字符用
+unsigned char Addr_Head = 0xf0;// EPROM 存储首地址，后续共0x0e个字节数据
 
 //核心变量
 uint8_t Status_Clock = 1; //当前显示闹钟 1 2 3 4 5
-u8 Now[3];
+uint8_t Now[3];
 uint8_t Status_Mode =0; //模式状态 0-停止 1-暂停 2-开始  3-设置
-													//           STOP   PAUL   BEGIN   SET
 uint8_t Status_Setting = 0;//设置模式 0-非 1-时 2-分 3-秒
 
 //函数声明
@@ -37,6 +40,8 @@ void Key_B1_L(void);
 void Key_B2_L(void);
 void Key_B3_L(void);
 void Key_B4_L(void);
+uint8_t x24c02_read(uint8_t address);
+void x24c02_write(unsigned char address,unsigned char info);
 
 //*****************************//
 //**********主函数*************//
@@ -48,6 +53,7 @@ int main(void)
 	Init_Led();
 	Init_Key();
 	Init_Pwm();
+	i2c_init();	
 	//屏幕初始化
 	STM3210B_LCD_Init();
 	LCD_Clear(Black);
@@ -84,10 +90,6 @@ void Delay_Ms(u32 nTime)
 //长短按键区分
 void Deal_Key(uint8_t key)
 {
-	u16 Key_Num = 0;          //按键长按计数器
-	u16 Key_Long_Set = 16 ;   //长按按键计数器阈值
-	u32 Key_Long_Delay = 50 ; //长按按键计数器周期 ms
-
 	//长按判断
 	while(Key_Scan())
 	{
@@ -298,6 +300,40 @@ void Show_Warning(u8 *ptr)
 	LCD_SetTextColor(Green);
 	Delay_Ms(2000);
 	LCD_ClearLine(Line7);
+}
+
+uint8_t x24c02_read(uint8_t address)
+{
+	unsigned char val;
+	
+	I2CStart();
+	I2CSendByte(0xa0);
+	I2CWaitAck();
+
+	I2CSendByte(address);
+	I2CWaitAck();
+
+	I2CStart();
+	I2CSendByte(0xa1);
+	I2CWaitAck();
+	val = I2CReceiveByte();
+	I2CWaitAck();
+	I2CStop();
+
+	return(val);
+}
+
+void x24c02_write(unsigned char address,unsigned char info)
+{
+	I2CStart();
+	I2CSendByte(0xa0);
+	I2CWaitAck();
+
+	I2CSendByte(address);
+	I2CWaitAck();
+	I2CSendByte(info);
+	I2CWaitAck();
+	I2CStop();
 }
 
 /******************* Edit By Yours <www.yoursc.cn> *****END OF FILE****/
