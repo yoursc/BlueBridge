@@ -18,7 +18,7 @@ char Strings[20];  //转义打印变量字符用
 
 //核心变量
 uint8_t Status_Clock = 1; //当前显示闹钟 1 2 3 4 5
-u8 Now[3]={0,0,0};
+u8 Now[3];
 uint8_t Status_Mode =0; //模式状态 0-停止 1-暂停 2-开始  3-设置
 													//           STOP   PAUL   BEGIN   SET
 uint8_t Status_Setting = 0;//设置模式 0-非 1-时 2-分 3-秒
@@ -42,19 +42,23 @@ void Key_B4_L(void);
 //*****************************//
 int main(void)
 {
-	//初始化
+	//硬件初始化
 	SysTick_Config(SystemCoreClock/1000);
 	Init_Led();
 	Init_Key();
 	Init_Pwm();
-	
+	//屏幕初始化
 	STM3210B_LCD_Init();
 	LCD_Clear(Black);
 	LCD_SetTextColor(Green);
 	LCD_SetBackColor(Black);
-	
-	LED_Control(LEDALL,0);
+	//变量初始化
+	Now[0]=hh[Status_Clock-1];
+	Now[1]=mm[Status_Clock-1];
+	Now[2]=ss[Status_Clock-1];
 
+	//高级初始化程序
+	LED_Control(LEDALL,0);
 	Show(1);
 	Show(2);
 	Show(3);
