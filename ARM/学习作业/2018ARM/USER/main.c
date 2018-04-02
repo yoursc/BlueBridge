@@ -14,6 +14,7 @@ u8 hh[5]={1,2,3,4,5};
 u8 mm[5]={11,12,13,14,15};
 u8 ss[5]={21,22,23,24,25};
 char Num_Table[10]={'0','1','2','3','4','5','6','7','8','9'};
+char Strings[20];  //转义打印变量字符用
 
 //核心变量
 uint8_t Status_Clock = 1; //当前显示闹钟 1 2 3 4 5
@@ -25,6 +26,7 @@ uint8_t Status_Setting = 0;//设置模式 0-非 1-时 2-分 3-秒
 //函数声明
 void Delay_Ms(u32 nTime);
 void Show(u8 linex);
+void Show_Warning(u8 *ptr);
 void Key_Deal(uint8_t key);
 void Key_B1_S(void);
 void Key_B2_S(void);
@@ -56,6 +58,8 @@ int main(void)
 	Show(1);
 	Show(2);
 	Show(3);
+	Show_Warning("   Hello  World  !   ");
+//	LCD_DisplayChar(Line1,319-16*2,'F');
   while (1)
   {
 		Key_Deal(Key_Scan());
@@ -157,9 +161,7 @@ void Key_B4_L(void)
 }
 
 void Show(u8 linex)
-{
-	char Strings[20],temp[1];
-	
+{	
 	switch(linex){
 		
 		case 1:
@@ -203,5 +205,15 @@ void Show(u8 linex)
 			break;
 	}
 }
+//显示警告，在屏幕上打印提醒
+// 等待时长 2s
+void Show_Warning(u8 *ptr)
+{
+	LCD_SetTextColor(Red);
+	LCD_DisplayStringLine(Line7,ptr);
+	LCD_SetTextColor(Green);
+	Delay_Ms(2000);
+	LCD_ClearLine(Line7);
+}
 
-/******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
+/******************* Edit By Yours <www.yoursc.cn> *****END OF FILE****/
