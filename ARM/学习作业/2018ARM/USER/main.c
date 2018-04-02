@@ -10,15 +10,21 @@
 
 //辅助变量
 u32 TimingDelay = 0;
+u8 hh[5]={1,2,3,4,5};
+u8 mm[5]={11,12,13,14,15};
+u8 ss[5]={21,22,23,24,25};
+char Num_Table[10]={'0','1','2','3','4','5','6','7','8','9'};
 
 //核心变量
 uint8_t Status_Clock = 1; //当前显示闹钟 1 2 3 4 5
-u8 HH=0,MM=1,SS=0;
+u8 Now[3]={0,0,0};
 uint8_t Status_Status =0; //模式状态 0-停止 1-暂停 2-开始  3-设置
 													//           STOP   PAUL   BEGIN   SET
+uint8_t Status_Setting = 0;//设置模式 0-非 1-时 2-分 3-秒
 
 //函数声明
 void Delay_Ms(u32 nTime);
+void Show(u8 linex);
 void Key_Deal(uint8_t key);
 void Key_B1_S(void);
 void Key_B2_S(void);
@@ -46,6 +52,10 @@ int main(void)
 	LCD_SetBackColor(Black);
 	
 	LED_Control(LEDALL,0);
+
+	Show(1);
+	Show(2);
+	Show(3);
   while (1)
   {
 		Key_Deal(Key_Scan());
@@ -117,6 +127,7 @@ void Key_Deal(uint8_t key)
 	Key_Num=0;	
 }
 
+//短按B1***************************
 void Key_B1_S(void)
 {
 }
@@ -143,6 +154,54 @@ void Key_B4_L(void)
 {
 	LED_Control(LEDALL,0);
 	LED_Control(LED1,1);	
+}
+
+void Show(u8 linex)
+{
+	char Strings[20],temp[1];
+	
+	switch(linex){
+		
+		case 1:
+			sprintf(Strings,"  Clock : %1d       ",Status_Clock);
+			LCD_DisplayStringLine(Line1,Strings);
+			break;
+		
+		case 2:
+			sprintf(Strings,"     %2d:%2d:%2d     ",Now[0],Now[1],Now[2]);
+			LCD_DisplayStringLine(Line3,Strings);
+			break;
+		
+		case 3:
+			switch(Status_Status)
+			{
+				case 0:
+					sprintf(Strings,"       STOP       ");
+					break;
+				case 1:
+					sprintf(Strings,"       PAUSE      ");
+					break;
+				case 2:
+					sprintf(Strings,"      BEGING      ");
+					break;
+				case 3:
+					sprintf(Strings,"      SETTING     ");
+					break;
+			}
+			LCD_DisplayStringLine(Line5,Strings);
+			break;
+			
+		case 4:
+			Show(2);
+			if(Status_Setting!=0)
+			{
+				LCD_SetBackColor(Blue);
+				LCD_DisplayChar(Line3,319-16*(3*Status_Setting+2), Num_Table[ Now[Status_Setting-1]/10 ] );
+				LCD_DisplayChar(Line3,319-16*(3*Status_Setting+3), Num_Table[ Now[Status_Setting-1]%10 ] );
+				LCD_SetBackColor(Black);
+			}
+			break;
+	}
 }
 
 /******************* (C) COPYRIGHT 2011 STMicroelectronics *****END OF FILE****/
