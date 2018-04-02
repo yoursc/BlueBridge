@@ -19,7 +19,7 @@ char Strings[20];  //转义打印变量字符用
 //核心变量
 uint8_t Status_Clock = 1; //当前显示闹钟 1 2 3 4 5
 u8 Now[3]={0,0,0};
-uint8_t Status_Status =0; //模式状态 0-停止 1-暂停 2-开始  3-设置
+uint8_t Status_Mode =0; //模式状态 0-停止 1-暂停 2-开始  3-设置
 													//           STOP   PAUL   BEGIN   SET
 uint8_t Status_Setting = 0;//设置模式 0-非 1-时 2-分 3-秒
 
@@ -134,26 +134,74 @@ void Key_Deal(uint8_t key)
 //短按B1***************************
 void Key_B1_S(void)
 {
+	Status_Mode = 0;   //计时器停止
+	Status_Setting = 0;//设置结束
+	
+	Status_Clock+=1; 
+	if(Status_Clock == 6)
+		Status_Clock = 1;
+
+	Now[0]=hh[Status_Clock-1];
+	Now[1]=mm[Status_Clock-1];
+	Now[2]=ss[Status_Clock-1];
+
+	Show(1);
+	Show(2);
+	Show(3);
 }
+//短按B2***************************
 void Key_B2_S(void)
 {
+	if( (Status_Mode==0) || (Status_Mode==3) ){
+		Status_Setting += 1;
+		Status_Mode = 3;
+		if(Status_Setting == 4){
+			Status_Setting = 0;
+			Status_Mode = 0;
+		}
+		Show(3);
+		Show(4);
+	}
+	else
+	{
+		Show_Warning(" Please Stop Clock ! ");
+	}	
 }
+//短按B3***************************
 void Key_B3_S(void)
 {
 }
+//短按B4***************************
 void Key_B4_S(void)
 {
 	LED_Control(LEDALL,0);
 }
+//长按B1***************************
 void Key_B1_L(void)
 {
+	Show_Warning("Def Key_B1_L is Empty");
 }
+//长按B2***************************
 void Key_B2_L(void)
 {
+	if( (Status_Mode==0) || (Status_Mode==3) ){
+		//将当前倒计时的设置时长保存到EPROM
+		Status_Mode = 0;
+		Show(2);
+		Show(3);
+		//此处待补充向EPROM存储的代码！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+		sprintf(Strings," Clock %d has saving ! ",Status_Clock);		
+		Show_Warning(Strings);
+	}
+	else	{
+		Show_Warning(" Please Stop Clock ! ");
+	}	
 }
+//长按B3***************************
 void Key_B3_L(void)
 {
 }
+//长按B4***************************
 void Key_B4_L(void)
 {
 	LED_Control(LEDALL,0);
@@ -175,7 +223,7 @@ void Show(u8 linex)
 			break;
 		
 		case 3:
-			switch(Status_Status)
+			switch(Status_Mode)
 			{
 				case 0:
 					sprintf(Strings,"       STOP       ");
