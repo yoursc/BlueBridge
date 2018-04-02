@@ -163,8 +163,8 @@ void Key_B2_S(void)
 			Status_Setting = 0;
 			Status_Mode = 0;
 		}
+		Show(2);
 		Show(3);
-		Show(4);
 	}
 	else
 	{
@@ -191,6 +191,7 @@ void Key_B2_L(void)
 	if( (Status_Mode==0) || (Status_Mode==3) ){
 		//将当前倒计时的设置时长保存到EPROM
 		Status_Mode = 0;
+		Status_Setting = 0;
 		Show(2);
 		Show(3);
 		//此处待补充向EPROM存储的代码！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
@@ -224,6 +225,14 @@ void Show(u8 linex)
 		case 2:
 			sprintf(Strings,"     %2d:%2d:%2d     ",Now[0],Now[1],Now[2]);
 			LCD_DisplayStringLine(Line3,Strings);
+			//设置模式时执行以下
+			if(Status_Setting!=0)
+			{
+				LCD_SetBackColor(Blue);
+				LCD_DisplayChar(Line3,319-16*(3*Status_Setting+2), Num_Table[ Now[Status_Setting-1]/10 ] );
+				LCD_DisplayChar(Line3,319-16*(3*Status_Setting+3), Num_Table[ Now[Status_Setting-1]%10 ] );
+				LCD_SetBackColor(Black);
+			}		
 			break;
 		
 		case 3:
@@ -243,17 +252,6 @@ void Show(u8 linex)
 					break;
 			}
 			LCD_DisplayStringLine(Line5,Strings);
-			break;
-			
-		case 4:
-			Show(2);
-			if(Status_Setting!=0)
-			{
-				LCD_SetBackColor(Blue);
-				LCD_DisplayChar(Line3,319-16*(3*Status_Setting+2), Num_Table[ Now[Status_Setting-1]/10 ] );
-				LCD_DisplayChar(Line3,319-16*(3*Status_Setting+3), Num_Table[ Now[Status_Setting-1]%10 ] );
-				LCD_SetBackColor(Black);
-			}
 			break;
 	}
 }
