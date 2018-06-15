@@ -41,18 +41,21 @@ void Init_Pwm(void) // fre PWM波频率（Hz）
     TIM3 Channel4 duty cycle = (TIM3_CCR4/ TIM3_ARR)* 100 = 12.5%
   ----------------------------------------------------------------------- */
   /* Compute the prescaler value */
-  PrescalerValue = (uint16_t) (SystemCoreClock / 24000000) - 1;//周期长度
   /* Time base configuration */
-  TIM_TimeBaseInitStruct.TIM_Period = 23999; //1,000Hz的周期长度 24,000,000/1,000-1=23,999
-  TIM_TimeBaseInitStruct.TIM_Prescaler = PrescalerValue;//预分频
-  TIM_TimeBaseInitStruct.TIM_ClockDivision = 0;         //时钟分割
+  TIM_TimeBaseInitStruct.TIM_Period = 999; //1,000Hz的周期长度 24,000,000/1,000-1=23,999
+  TIM_TimeBaseInitStruct.TIM_Prescaler = 0;  //预分频
+  TIM_TimeBaseInitStruct.TIM_ClockDivision = 0;//时钟分割
   TIM_TimeBaseInitStruct.TIM_CounterMode = TIM_CounterMode_Up;//向上计数模式
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseInitStruct);
+	//TIM3预分频设置:1MHZ,APB1分频系数2，TIM3时钟为36MHzx2 = 72MHz  
+	TIM_PrescalerConfig(TIM3,71, TIM_PSCReloadMode_Immediate);	
+
+	TIM_ITConfig(TIM3,TIM_IT_Update, ENABLE);	
 
 	/* PWM1 Mode configuration: Channel1 */
 	TIM_OCInitStruct.TIM_OCMode = TIM_OCMode_PWM1;
 	TIM_OCInitStruct.TIM_OutputState = TIM_OutputState_Enable;
-	TIM_OCInitStruct.TIM_Pulse = 19199;
+	TIM_OCInitStruct.TIM_Pulse = 799;
 	TIM_OCInitStruct.TIM_OCPolarity = TIM_OCPolarity_High;
 	TIM_OC1Init(TIM3, &TIM_OCInitStruct);
 	TIM_OC1PreloadConfig(TIM3, TIM_OCPreload_Enable);
@@ -60,5 +63,19 @@ void Init_Pwm(void) // fre PWM波频率（Hz）
 	/* TIM3 enable counter */
 	TIM_Cmd(TIM3, ENABLE);//使能TIM2定时计数器
 }
+
+void NVIC_Configuration(void)
+{
+	NVIC_InitTypeDef NVIC_InitStructure;
+
+	/* Enable the TIM2 global Interrupt */
+	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+
+	NVIC_Init(&NVIC_InitStructure);
+}
+
 
 /******************* Edit By Yours <www.yoursc.cn> *****END OF FILE****/

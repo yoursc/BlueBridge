@@ -4,6 +4,7 @@
 #include "stm32f10x.h"
 
 void Init_Pwm(void);
+void NVIC_Configuration(void);
 
 #endif
 

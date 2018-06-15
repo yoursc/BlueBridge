@@ -57,6 +57,7 @@ int main(void)
 	Init_Key();
 	Init_Pwm();
 	i2c_init();	
+	NVIC_Configuration();
 	//屏幕初始化
 	STM3210B_LCD_Init();
 	LCD_Clear(Black);
@@ -69,12 +70,12 @@ int main(void)
 	Now[2]=ss[Status_Clock-1];
 
 	//高级初始化程序
+	TIM_Cmd(TIM3, DISABLE);
 	LED_Control(LEDALL,0);
 	Show(1);
 	Show(2);
 	Show(3);
 	Show_Warning("   Hello  World  !   ");
-//	LCD_DisplayChar(Line1,319-16*2,'F');
   while (1)
   {
 		Deal_Key(Key_Scan());
@@ -164,16 +165,22 @@ void Deal_Add(void)
 void Deal_Set_Mode(uint8_t mode)
 {
 	Status_Mode = mode;
+	LED_Control(LEDALL,0);
 	switch(mode)
 	{
 		case 0:
 			hh[Status_Clock-1]=Now[0];
 			mm[Status_Clock-1]=Now[1];
 			ss[Status_Clock-1]=Now[2];
+			TIM_Cmd(TIM3, DISABLE);
 			break;
 		case 1:
+			TIM_Cmd(TIM3, DISABLE);
 			break;
 		case 2:
+			TIM_Cmd(TIM3, ENABLE);
+			LED_Control(LEDALL,0);
+			LED_Control(LED1,1);
 			break;
 	}
 	Show(3);
@@ -249,10 +256,9 @@ void Key_B2_L(void)
 {
 	if( (Status_Mode==0) || (Status_Mode==3) ){
 		//将当前倒计时的设置时长保存到EPROM
-		Status_Mode = 0;
+		Deal_Set_Mode(0);
 		Status_Setting = 0;
 		Show(2);
-		Show(3);
 		Time_Save(Status_Clock);
 		
 		sprintf(Strings," Clock %d has saving ! ",Status_Clock);		

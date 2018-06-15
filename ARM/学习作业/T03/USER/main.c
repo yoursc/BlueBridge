@@ -12,6 +12,8 @@
 
 uint32_t msTimer;
 uint8_t LED2_Status = 0;
+uint8_t Status_ADC = 0;
+uint8_t Status_Usert = 0;
 
 void Delay_ms(uint32_t xMs);
 uint8_t x24c02_read(uint8_t address);
@@ -21,6 +23,7 @@ void x24c02_write(uint8_t address,uint8_t info);
 
 int main(void)
 {
+	uint8_t addr=0x00;
 	uint8_t temp;
 	uint8_t string[20];
 	SysTick_Config(SystemCoreClock/1000);  //滴答定时器设定
@@ -40,23 +43,32 @@ int main(void)
 	LCD_SetTextColor(Green);
 	//初始化结束
 	LED_Control(LEDALL,0);
-	LED_Control(LED1,1);
 	USART_SendString("Welcome to GXCT\r\n");
-	temp = x24c02_read(0xfe);
-	sprintf(string,"%s%d","ADDR:0xFF,EEPROM:",temp);
-	LCD_DisplayStringLine(Line6,string);
 	while(1){
-		Delay_ms(200);
+		if(Status_ADC>=4){
 		sprintf(string,"%s%.3f","ADC Value:",Read_ADC());
 		LCD_DisplayStringLine(Line7,string);
+		Status_ADC = 0;
+		}
+		
 		if(TimeDisplay == 1){
 			uint32_t TimeVar = RTC_GetCounter();
+			temp = x24c02_read(addr);
+			sprintf(string,"ADDR:0x%d,EPROM:%2d",addr,temp);
+			LCD_DisplayStringLine(Line6,string);
+			addr++;
+			
 			sprintf(string,"Time: %0.2d:%0.2d:%0.2d",(TimeVar/3600), ((TimeVar%3600)/60), ((TimeVar%3600)%60));
 			LCD_DisplayStringLine(Line8,string);
 			TimeDisplay = 0;  //清除标志位
 		}
-		LED_Control(LEDALL,0);
-		LED_Control(LED2,LED2_Status);
+		
+		if(Status_Usert==1)
+		{
+			USART_SendString("Hellow World!\r\n");
+			Status_Usert=0;
+		}
+
 	}
 }
 
